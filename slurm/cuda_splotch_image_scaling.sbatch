@@ -11,85 +11,43 @@
 #SBATCH --partition=viz
 #SBATCH --time=01:00:00
 
-# Set executables to compare
+# Set executables and lognames to compare
 EXE1=./Splotch6-NOATOMICS
+LOG1=ATOMIC
 EXE2=./Splotch6-ATOMICS
-# Source parameter file (should not have xres or yres set)
+LOG2=NOATOMIC
+
+# Parameter being modifed
+MODPAR=xres
+
+# Source parameter file (should not have $MODPAR set)
 PARFILE=demo_orig.par
+
 # Log directory (this must already exist)
 LOGDIR=logs
-# Parameter being modifed and starting value
-MODPAR=xres
-MODVAL=128
 
 module load cudatoolkit
 
 #-------------------------------------------------------------------
 echo "Beginning image size test: CUDA atomics vs selective update"
-echo "Test 1: 128sq"
 
-cat PARFILE > scratch.par
-echo "$MODPAR=$MODVAL" >> scratch.par
+# Loop for each image size
+for ARG in 128 256 512 1024 2048
+do 
 
-LOGNAME=NOATOMIC_128.log
-echo "$EXE1 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE1 scratch.par >> $LOGDIR/$LOGNAME
-LOGNAME=ATOMIC_128.log
-echo "$EXE2 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE2 scratch.par >> $LOGDIR/$LOGNAME
+# Set up scratch parameter file for test
+echo "Test: ${ARG}sq"
+cat $PARFILE > scratch.par
+echo "$MODPAR=$ARG" >> scratch.par
 
-#-------------------------------------------------------------------
-echo "Test 2: 256sq"
-MODVAL=256
-cat PARFILE > scratch.par
-echo "$MODPAR=$MODVAL" >> scratch.par
+# Run test one
+LOGNAME=NOATOMIC_${ARG}.log
+echo "$EXE1 : $MODPAR=$ARG" >> $LOGDIR/$LOGNAME
+aprun -n 1 $EXE1 scratch.par >> $LOGDIR/$LOGNAME
 
-LOGNAME=NOATOMIC_256.log
-echo "$EXE1 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE1 scratch.par >> $LOGDIR/$LOGNAME
+# Run test two
+LOGNAME=ATOMIC_${ARG}.log
+echo "$EXE2 : $MODPAR=$$ARG" >> $LOGDIR/$LOGNAME
+aprun -n 1 $EXE2 scratch.par >> $LOGDIR/$LOGNAME
 
-LOGNAME=ATOMIC_256.log
-echo "$EXE2 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE2 scratch.par >> $LOGDIR/$LOGNAME
-
-#-------------------------------------------------------------------
-echo "Test 3: 512sq"
-MODVAL=512
-cat PARFILE > scratch.par
-echo "$MODPAR=$MODVAL" >> scratch.par
-
-LOGNAME=NOATOMIC_512.log
-echo "$EXE1 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE1 scratch.par >> $LOGDIR/$LOGNAME
-
-LOGNAME=ATOMIC_512.log
-echo "$EXE2 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE2 scratch.par >> $LOGDIR/$LOGNAME
-
-#-------------------------------------------------------------------
-echo "Test 4: 1024sq"
-MODVAL=1024
-cat PARFILE > scratch.par
-echo "$MODPAR=$MODVAL" >> scratch.par
-
-LOGNAME=NOATOMIC_1024.log
-echo "$EXE1 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE1 scratch.par >> $LOGDIR/$LOGNAME
-
-LOGNAME=ATOMIC_1024.log
-echo "$EXE2 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE2 scratch.par >> $LOGDIR/$LOGNAME
-
-#-------------------------------------------------------------------
-echo "Test 5: 2048sq"
-MODVAL=2048
-cat PARFILE > scratch.par
-echo "$MODPAR=$MODVAL" >> scratch.par
-
-LOGNAME=NOATOMIC_2048.log
-echo "$EXE1 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE1 scratch.par >> $LOGDIR/$LOGNAME
-
-LOGNAME=ATOMIC_2048.log
-echo "$EXE2 : $MODPAR=$MODVAL" >> $LOGDIR/$LOGNAME
-aprun -n 1 EXE2 scratch.par >> $LOGDIR/$LOGNAME
+done

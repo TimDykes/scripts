@@ -1,1 +1,1 @@
-A collection of scripts used for various tasks 
+A collection of scripts for various tasks 
