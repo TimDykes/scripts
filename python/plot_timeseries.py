@@ -8,15 +8,29 @@ import itertools
 
 
 narg = len(sys.argv)
-if narg !=  4:
-    print('Error; Usage: ./plot_tP.py filepath plottitle nfiles [ filepath includes filename up to ., then extension will be added in XXXXX format]')
+if narg <  4 or narg >  5:
+    print('Error; Usage: python plot_timeseries.py filepath plottitle nfiles [optinal: filestep] { filepath includes filename up to ., then extension will be added in XXXXX format }')
 
-means = []
-meansRHO = []
+# Number of years for one timestep 
+timeunit = 1.5925
+
+# Assume distance unit is already AU
+# Width of radial bins in AU, maximum distance to extend bins to (from 0)
 AUstep = 1
 AUmax = 15
 
-for r in range(0,int(sys.argv[3]), 5):
+# Step between file outputs
+if(narg > 4):
+	filestep = argv[4]
+else
+	filestep = 1
+
+
+
+means = []
+meansRHO = []
+
+for r in range(0,int(sys.argv[3]), filestep):
 
 	# Build filename 
 	fn = sys.argv[1]+'{:05}'.format(r)
@@ -116,7 +130,7 @@ ax.set_ylabel('Temperature (K)')
 h = []
 i = 0
 for i,s in enumerate(series,1):
-	time = [ (e*5*1.5925) for e in np.arange(len(s)) ]
+	time = [ (e*filestep*timeunit) for e in np.arange(len(s)) ]
 	hand, = ax.plot(time, s, label=str(i*AUstep)+' AU')
 	h.append(hand)
 
