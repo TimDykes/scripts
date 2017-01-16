@@ -1,1 +1,1 @@
-A collection of scripts for various tasks 
+Scripts and config files
