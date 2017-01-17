@@ -21,8 +21,8 @@ AUmax = 15
 
 # Step between file outputs
 if(narg > 4):
-	filestep = argv[4]
-else
+	filestep = sys.argv[4]
+else:
 	filestep = 1
 
 
@@ -30,7 +30,7 @@ else
 means = []
 meansRHO = []
 
-for r in range(0,int(sys.argv[3]), filestep):
+for r in range(0,int(sys.argv[3]), int(filestep)):
 
 	# Build filename 
 	fn = sys.argv[1]+'{:05}'.format(r)
@@ -74,11 +74,11 @@ ax0.set_ylabel('Temperature (K)')
 
 h0 = []
 i0 = 0
-xaxis = np.arange(0,AUmax,AUstep)
+xaxis = np.arange(1,AUmax+1,AUstep)
 labs = ['Disk IC', '~1.6yr']
 
-for i in range(0,2):
-	hand0, = ax0.plot(xaxis, means[i], label=labs[i])
+for i in range(0,int(sys.argv[3]), filestep):
+	hand0, = ax0.plot(xaxis, means[i], label='~'+str(i*1.6)+' Yrs')
 	h0.append(hand0)
 
 for l0, ms0 in zip(ax0.lines, itertools.cycle('>^+*')):
@@ -102,8 +102,8 @@ ax1.set_yscale('log')
 
 h1 = []
 i1 = 0
-for i in range(0,2):
-	hand1, = ax1.plot(xaxis, meansRHO[i], label=labs[i])
+for i in range(0,int(sys.argv[3]), filestep):
+	hand1, = ax1.plot(xaxis, meansRHO[i], label='~'+str(i*1.6)+' Yrs')
 	h1.append(hand1)
 
 for l1, ms1 in zip(ax1.lines, itertools.cycle('>^+*')):
